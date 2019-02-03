@@ -29,5 +29,8 @@
     "passport-google-oauth20": "^1.0.0",
     "path": "^0.12.7",
     "stripe": "^6.23.0"
+  },
+  "devDependencies": {
+    "terser": "^3.14.1"
   }
 }

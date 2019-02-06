@@ -6,7 +6,7 @@ const surveyTemplate = require('../services/emailTemplates/surveyTemplate');
 
 // We could require Survey model from the model file,
 // but sometimes mongoose complains during testing ('too many requests').
-const Surveys = mongoose.model('surveys');
+const Survey = mongoose.model('surveys');
 
 module.exports = app => {
     app.post('/api/surveys', requireLogin, requireCredits, (req, res) => {
@@ -24,6 +24,7 @@ module.exports = app => {
 
         // Send an email here
         const mailer = new Mailer(survey, surveyTemplate(survey));
+        mailer.send();
 
     });
 };

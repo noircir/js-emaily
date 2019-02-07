@@ -8,6 +8,11 @@ import reduxThunk from 'redux-thunk';
 
 import App from './components/App';
 import reducers from './reducers';
+
+// Development only axios helpers! Put this in the browser:
+//  const mySurvey = {subject: '..', title: '..', recipients: '..', body: '..'}
+//  axios.post(mySurvey, survey);
+
 import axios from 'axios';
 window.axios = axios;
 

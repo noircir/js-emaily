@@ -8,6 +8,5 @@ export default (emails) => {
 	if (invalidEmails.length >= 1) {
 		return `These emails are invalid: ${invalidEmails}`;
 	}
-
 	return;
 };

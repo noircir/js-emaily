@@ -13,8 +13,8 @@ import reducers from './reducers';
 //  const mySurvey = {subject: '..', title: '..', recipients: '..', body: '..'}
 //  axios.post(mySurvey, survey);
 
-import axios from 'axios';
-window.axios = axios;
+// import axios from 'axios';
+// window.axios = axios;
 
 const store = createStore(reducers, {}, applyMiddleware(reduxThunk));
 

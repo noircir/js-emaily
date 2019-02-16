@@ -1,5 +1,6 @@
 // SurveyNew shows SurveyForm and SurveyFormReview
 import React from 'react';
+import { reduxForm } from 'redux-form';
 import SurveyForm from './SurveyForm';
 import SurveyFormReview from './SurveyFormReview';
 
@@ -19,4 +20,9 @@ class SurveyNew extends React.Component {
 	}
 }
 
-export default SurveyNew;
+// Generally, the form wiring up here (the parent of SurveyForm and SurveyFormReview)
+// is not needed. However, wiring a form here helps to clear up the form fields
+// when starting a new review.
+export default reduxForm({
+	form: 'surveyForm'
+})(SurveyNew);

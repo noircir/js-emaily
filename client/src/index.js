@@ -1,4 +1,3 @@
-
 import 'materialize-css/dist/css/materialize.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -13,13 +12,14 @@ import reducers from './reducers';
 //  const mySurvey = {subject: '..', title: '..', recipients: '..', body: '..'}
 //  axios.post(mySurvey, survey);
 
-// import axios from 'axios';
-// window.axios = axios;
+import axios from 'axios';
+window.axios = axios;
 
 const store = createStore(reducers, {}, applyMiddleware(reduxThunk));
 
 ReactDOM.render(
-    <Provider store={store}>
-        <App />
-    </Provider>, 
-    document.querySelector('#root'));
+	<Provider store={store}>
+		<App />
+	</Provider>,
+	document.querySelector('#root')
+);

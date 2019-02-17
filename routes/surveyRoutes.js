@@ -14,55 +14,61 @@ const surveyTemplate = require('../services/emailTemplates/surveyTemplate');
 const Survey = mongoose.model('surveys');
 
 module.exports = (app) => {
-	app.get('/api/surveys/thanks', (req, res) => {
+	app.get('/api/surveys/:surveyId/:choice', (req, res) => {
 		res.send('Thanks for voting!');
-	});
-
-	app.get('/api/surveys/:id/yes', (req, res) => {
-		res.send('This is Yes branch');
-	});
-
-	app.get('/api/surveys/:id/no', (req, res) => {
-		res.send('This is No branch');
 	});
 
 	app.post('/api/surveys/webhooks', (req, res) => {
 		const p = new Path('/api/surveys/:surveyId/:choice');
 		// Extract email, surveyId, and answer first.
 
-		const events = _.map(req.body, ({ url, email }) => {
-			// p.test(pathname) returns an object with wildcards :surveyId
-			// and :choice, or null
-			const match = p.test(new URL(url).pathname);
-			console.log('=======================');
-			console.log('match: ', match);
-			console.log('=======================');
-			if (match) {
-				return { email, surveyId: match.surveyId, choice: match.choice };
-			}
-		});
+		// const events = _.map(req.body, ({ url, email }) => {
+		// 	// p.test(pathname) returns an object with wildcards :surveyId
+		// 	// and :choice, or null
+		// 	const match = p.test(new URL(url).pathname);
+		// 	console.log('=======================');
+		// 	console.log('match: ', match);
+		// 	console.log('=======================');
+		// 	if (match) {
+		// 		return { email, surveyId: match.surveyId, choice: match.choice };
+		// 	}
+		// });
 
-		console.log('=======================');
-		console.log('events: ', events);
-		console.log('=======================');
+		// console.log('=======================');
+		// console.log('events: ', events);
+		// console.log('=======================');
 
-		// Second, remove any "undefined" results.
-		const compactEvents = _.compact(events);
+		// // Second, remove any "undefined" results.
+		// const compactEvents = _.compact(events);
 
-		// Remove duplicates where both email and surveyID are similar.
-		const uniiqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
+		// // Remove duplicates where both email and surveyID are similar.
+		// const uniiqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
 
-		// const events = _.chain(req.body)
-		// 	.map(({ url, email }) => {
-		// 		const match = p.test(new URL(url).pathname);
-		// 		if (match) {
-		// 			return { email, surveyId: match.surveyId, choice: match.choice };
-		// 		}
-		// 	})
-		// 	.compact()
-		// 	// .uniqBy('email', 'surveyId')
-		// 	.uniqWith(_.isEqual)
-		// 	.value();
+		_.chain(req.body)
+			.map(({ url, email }) => {
+				const match = p.test(new URL(url).pathname);
+				if (match) {
+					return { email, surveyId: match.surveyId, choice: match.choice };
+				}
+			})
+			.compact()
+			.uniqBy('email', 'surveyId')
+			.each(({ surveyId, email, choice }) => {
+				Survey.updateOne(
+					{
+						_id: surveyId,
+						recipients: {
+							$elemMatch: { email: email, responded: false }
+						}
+					},
+					{
+						$inc: { [choice]: 1 },
+						$set: { 'recipients.$.responded': true },
+						lastResponded: new Date()
+					}
+				).exec();
+			})
+			.value();
 
 		// console.log(events);
 		res.send({});

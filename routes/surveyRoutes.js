@@ -27,12 +27,39 @@ module.exports = (app) => {
 	});
 
 	app.post('/api/surveys/webhooks', (req, res) => {
-		const events = _.map(req.body, (event) => {
-			const pathname = new URL(event.url).pathname;
-			const p = new Path('/api/surveys/:surveyId/:choice');
-			// console.log(pathname, p);
-			console.log(p.test(pathname));
-		});
+		const p = new Path('/api/surveys/:surveyId/:choice');
+		// Extract email, surveyId, and answer first.
+
+		// const events = _.map(req.body, ({ url, email }) => {
+		// 	// p.test(pathname) returns an object with wildcards :surveyId
+		// 	// and :choice, or null
+		// 	const match = p.test(new URL(url).pathname);
+		// 	if (match) {
+		// 		return { email, surveyId: match.surveyId, choice: match.choice };
+		// 	}
+		// });
+
+		// // console.log(events);
+
+		// // Second, remove any "undefined" results.
+		// const compactEvents = _.compact(events);
+
+		// // Remove duplicates where both email and surveyID are similar.
+		// const uniiqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
+
+		const events = _chain(req.body)
+			.map(({ url, email }) => {
+				const match = p.test(new URL(url).pathname);
+				if (match) {
+					return { email, surveyId: match.surveyId, choice: match.choice };
+				}
+			})
+			.compact()
+			.uniqBy('email', 'surveyId')
+			.value();
+
+		console.log(events);
+		res.send({});
 	});
 
 	app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {

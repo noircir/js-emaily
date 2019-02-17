@@ -1,3 +1,8 @@
+// These three libraries are for parsing SendGrid click results.
+const _ = require('lodash');
+const { Path } = require('path-parser');
+// 'url' library comes with Node.js
+const { URL } = require('url');
 const mongoose = require('mongoose');
 const requireLogin = require('../middlewares/requireLogin');
 const requireCredits = require('../middlewares/requireCredits');
@@ -22,8 +27,12 @@ module.exports = (app) => {
 	});
 
 	app.post('/api/surveys/webhooks', (req, res) => {
-		console.log(req.body);
-		res.send({});
+		const events = _.map(req.body, (event) => {
+			const pathname = new URL(event.url).pathname;
+			const p = new Path('/api/surveys/:surveyId/:choice');
+			// console.log(pathname, p);
+			console.log(p.test(pathname));
+		});
 	});
 
 	app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {

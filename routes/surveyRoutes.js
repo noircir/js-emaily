@@ -30,35 +30,41 @@ module.exports = (app) => {
 		const p = new Path('/api/surveys/:surveyId/:choice');
 		// Extract email, surveyId, and answer first.
 
-		// const events = _.map(req.body, ({ url, email }) => {
-		// 	// p.test(pathname) returns an object with wildcards :surveyId
-		// 	// and :choice, or null
-		// 	const match = p.test(new URL(url).pathname);
-		// 	if (match) {
-		// 		return { email, surveyId: match.surveyId, choice: match.choice };
-		// 	}
-		// });
+		const events = _.map(req.body, ({ url, email }) => {
+			// p.test(pathname) returns an object with wildcards :surveyId
+			// and :choice, or null
+			const match = p.test(new URL(url).pathname);
+			console.log('=======================');
+			console.log('match: ', match);
+			console.log('=======================');
+			if (match) {
+				return { email, surveyId: match.surveyId, choice: match.choice };
+			}
+		});
 
-		// // console.log(events);
+		console.log('=======================');
+		console.log('events: ', events);
+		console.log('=======================');
 
-		// // Second, remove any "undefined" results.
-		// const compactEvents = _.compact(events);
+		// Second, remove any "undefined" results.
+		const compactEvents = _.compact(events);
 
-		// // Remove duplicates where both email and surveyID are similar.
-		// const uniiqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
+		// Remove duplicates where both email and surveyID are similar.
+		const uniiqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
 
-		const events = _chain(req.body)
-			.map(({ url, email }) => {
-				const match = p.test(new URL(url).pathname);
-				if (match) {
-					return { email, surveyId: match.surveyId, choice: match.choice };
-				}
-			})
-			.compact()
-			.uniqBy('email', 'surveyId')
-			.value();
+		// const events = _.chain(req.body)
+		// 	.map(({ url, email }) => {
+		// 		const match = p.test(new URL(url).pathname);
+		// 		if (match) {
+		// 			return { email, surveyId: match.surveyId, choice: match.choice };
+		// 		}
+		// 	})
+		// 	.compact()
+		// 	// .uniqBy('email', 'surveyId')
+		// 	.uniqWith(_.isEqual)
+		// 	.value();
 
-		console.log(events);
+		// console.log(events);
 		res.send({});
 	});
 
